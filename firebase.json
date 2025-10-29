@@ -1,0 +1,28 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "filidides",
+          "appId": "1:554774423519:android:b5fcccc377e86e069d466a",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "filidides",
+          "configurations": {
+            "android": "1:554774423519:android:b5fcccc377e86e069d466a",
+            "ios": "1:554774423519:ios:19eede75e4d42fe69d466a",
+            "macos": "1:554774423519:ios:19eede75e4d42fe69d466a",
+            "web": "1:554774423519:web:b8e37a74ca33f0d99d466a",
+            "windows": "1:554774423519:web:16cc25f3261362a99d466a"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "singleProjectMode": true
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "554774423519",
+    "project_id": "filidides",
+    "storage_bucket": "filidides.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:554774423519:android:b5fcccc377e86e069d466a",
+        "android_client_info": {
+          "package_name": "com.example.filidides_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "554774423519-7kip5u6cf5k9h811iperu89bgva52crv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.filidides_app",
+            "certificate_hash": "a0c2f2597aac07f8d2b287bbb589d9e7a0bae89f"
+          }
+        },
+        {
+          "client_id": "554774423519-j3n5gog1vhtia147h4g33tpib9a5baf6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByWKWLPhtYGqlmQIYiAY2rq-cDmeLiTTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "554774423519-j3n5gog1vhtia147h4g33tpib9a5baf6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "554774423519-u997vpbh42gtamm5leu4ienlut23nuui.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.filididesApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
