@@ -1,5 +1,7 @@
+import 'package:filidides_app/core/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -122,10 +124,8 @@ class _MapScreenState extends State<MapScreen> {
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
   List<LatLng> _routePoints = [];
-  PolylinePoints polylinePoints = PolylinePoints(
-    apiKey: 'AIzaSyDfNy_m1wSjiIHHNQksb54mB3nVddGWOhw',
-  );
-  String googleApiKey = "AIzaSyDfNy_m1wSjiIHHNQksb54mB3nVddGWOhw";
+  late PolylinePoints polylinePoints;
+  bool _mapInitialized = false;
   String _travelTime = "Calcul en cours...";
   TravelMode _selectedMode = TravelMode.driving;
   final TextEditingController _searchController = TextEditingController();
@@ -140,9 +140,15 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    checkAndRequestPermission();
-    _locationService = GoogleLocationService(googleApiKey);
-    _placesService = GooglePlacesService(googleApiKey);
+    polylinePoints = PolylinePoints(apiKey: Constants.googleMapsApiKey);
+    _initGoogleMaps();
+  }
+
+  Future<void> _initGoogleMaps() async {
+    await checkAndRequestPermission();
+    _locationService = GoogleLocationService(Constants.googleMapsApiKey);
+    _placesService = GooglePlacesService(Constants.googleMapsApiKey);
+    setState(() => _mapInitialized = true);
   }
 
   Future<void> checkAndRequestPermission() async {
@@ -194,8 +200,7 @@ class _MapScreenState extends State<MapScreen> {
     const double R = 6371; // Earth radius in km
     double dLat = _deg2rad(lat2 - lat1);
     double dLon = _deg2rad(lon2 - lon1);
-    double a =
-        sin(dLat / 2) * sin(dLat / 2) +
+    double a = sin(dLat / 2) * sin(dLat / 2) +
         cos(_deg2rad(lat1)) *
             cos(_deg2rad(lat2)) *
             sin(dLon / 2) *
@@ -354,12 +359,12 @@ class _MapScreenState extends State<MapScreen> {
         title: _selectedIndex == 0
             ? const Text("Planificateur d'itinéraire")
             : _selectedIndex == 1
-            ? const Text("List")
-            : _selectedIndex == 2
-            ? const Text("Messages")
-            : _selectedIndex == 3
-            ? const Text("Mes paramêtres utilisateur")
-            : null,
+                ? const Text("List")
+                : _selectedIndex == 2
+                    ? const Text("Messages")
+                    : _selectedIndex == 3
+                        ? const Text("Mes paramêtres utilisateur")
+                        : null,
         actions: _selectedIndex == 0
             ? [
                 DropdownButton<TravelMode>(
@@ -459,11 +464,18 @@ class _MapScreenState extends State<MapScreen> {
     if (_selectedIndex == 0) {
       return SearchTab(
         googleMap: GoogleMap(
-          onMapCreated: (controller) => mapController = controller,
+          onMapCreated: (GoogleMapController controller) {
+            mapController = controller;
+            if (defaultTargetPlatform == TargetPlatform.android) {
+              controller.setMapStyle('[]'); // Reset map style if needed
+            }
+          },
           initialCameraPosition: const CameraPosition(
-            target: LatLng(48.8566, 2.3522),
+            target: LatLng(48.8566, 2.3522), // Paris coordinates
             zoom: 12.0,
           ),
+          myLocationEnabled: true, // Add this
+          myLocationButtonEnabled: true, // Add this
           markers: _markers,
           polylines: _polylines,
           onTap: _onMapTap,

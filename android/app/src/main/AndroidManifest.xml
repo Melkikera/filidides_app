@@ -1,11 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Add these permissions -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    
     <application
         android:label="filidides_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
-        <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyDfNy_m1wSjiIHHNQksb54mB3nVddGWOhw"/>
+        <!-- Add your API key here -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDfNy_m1wSjiIHHNQksb54mB3nVddGWOhw"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
