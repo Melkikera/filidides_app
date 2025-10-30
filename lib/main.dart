@@ -413,30 +413,35 @@ class _MapScreenState extends State<MapScreen> {
         },
       ),
       floatingActionButton: _selectedIndex == 0
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FloatingActionButton(
-                  heroTag: 'clear',
-                  onPressed: () {
-                    setState(() {
-                      _markers.clear();
-                      _polylines.clear();
-                      _routePoints.clear();
-                      _travelTime = "Calcul en cours...";
-                    });
-                  },
-                  child: const Icon(Icons.delete),
-                  tooltip: 'Clear',
-                ),
-                const SizedBox(height: 12),
-                FloatingActionButton(
-                  heroTag: 'save',
-                  onPressed: _saveJourney,
-                  child: const Icon(Icons.save),
-                  tooltip: 'Save journey',
-                ),
-              ],
+          ? Padding(
+              padding: const EdgeInsets.only(left: 32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment
+                    .start, // Align children to the start (left)
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'clear',
+                    onPressed: () {
+                      setState(() {
+                        _markers.clear();
+                        _polylines.clear();
+                        _routePoints.clear();
+                        _travelTime = "Calcul en cours...";
+                      });
+                    },
+                    child: const Icon(Icons.delete),
+                    tooltip: 'Clear',
+                  ),
+                  const SizedBox(height: 12),
+                  FloatingActionButton(
+                    heroTag: 'save',
+                    onPressed: _saveJourney,
+                    child: const Icon(Icons.save),
+                    tooltip: 'Save journey',
+                  ),
+                ],
+              ),
             )
           : null,
       bottomNavigationBar: BottomNavigationBar(

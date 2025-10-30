@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/journey.dart';
+import '../services/logger_service.dart'; // For logging
+import '../utils/constants.dart'; // For any constants you might need
+import '../services/navigation_service.dart'; // For navigation after journey selection
 
 class ListJourney extends StatelessWidget {
   final List<Journey> journeys;
