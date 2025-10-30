@@ -1,4 +1,5 @@
 import 'package:filidides_app/core/constants.dart';
+import 'package:filidides_app/src/models/journey.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -307,23 +308,28 @@ class _MapScreenState extends State<MapScreen> {
       }
       return;
     }
+
+    // Calculate price
+    final double journeyPrice = Journey.calculatePrice(_journeyDistance);
+
     // Prepare data to save
     final journeyData = {
       'markers': _markers
-          .map(
-            (m) => {
-              'lat': m.position.latitude,
-              'lng': m.position.longitude,
-              'title': m.infoWindow.title,
-            },
-          )
+          .map((m) => {
+                'lat': m.position.latitude,
+                'lng': m.position.longitude,
+                'title': m.infoWindow.title,
+              })
           .toList(),
       'routePoints': _routePoints
           .map((p) => {'lat': p.latitude, 'lng': p.longitude})
           .toList(),
+      'startLocation': _markers.first.infoWindow.title,
+      'endLocation': _markers.last.infoWindow.title,
       'travelTime': _travelTime,
       'mode': _selectedMode.toString(),
       'distance': _journeyDistance,
+      'price': journeyPrice,
       'timestamp': DateTime.now().toIso8601String(),
     };
 
@@ -397,7 +403,15 @@ class _MapScreenState extends State<MapScreen> {
               ]
             : null,
       ),
-      body: _buildTabBody(),
+      body: FutureBuilder<Widget>(
+        future: _buildTabBody(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data!;
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
       floatingActionButton: _selectedIndex == 0
           ? Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -460,7 +474,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _buildTabBody() {
+  Future<Widget> _buildTabBody() async {
     if (_selectedIndex == 0) {
       return SearchTab(
         googleMap: GoogleMap(
@@ -563,7 +577,32 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
     } else if (_selectedIndex == 1) {
-      return ListJourney(steps: exampleSteps);
+      // Load saved journeys from files
+      final directory = await getDownloadsDirectory();
+      final files = directory?.listSync().where(
+            (file) => file.path.endsWith('.json'),
+          );
+
+      List<Journey> journeys = [];
+
+      if (files != null) {
+        for (final file in files) {
+          final content = await File(file.path).readAsString();
+          final data = jsonDecode(content);
+          journeys.add(Journey(
+            points: (data['routePoints'] as List)
+                .map((p) => LatLng(p['lat'], p['lng']))
+                .toList(),
+            startLocation: data['startLocation'],
+            endLocation: data['endLocation'],
+            distance: data['distance'],
+            duration: data['travelTime'],
+            price: data['price'],
+          ));
+        }
+      }
+
+      return ListJourney(journeys: journeys);
     } else if (_selectedIndex == 2) {
       return ChatTab(
         messages: _chatMessages,
