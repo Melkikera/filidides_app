@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/journey.dart';
-import '../services/logger_service.dart'; // For logging
-import '../utils/constants.dart'; // For any constants you might need
-import '../services/navigation_service.dart'; // For navigation after journey selection
+import 'app_logger.dart';
+// For any constants you might need
+// For navigation after journey selection
 
 class ListJourney extends StatelessWidget {
   final List<Journey> journeys;
 
-  const ListJourney({Key? key, required this.journeys}) : super(key: key);
+  const ListJourney({super.key, required this.journeys});
 
   @override
   Widget build(BuildContext context) {
+    if (journeys.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(
+            'Aucun trajet enregistré',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
       itemCount: journeys.length,
       itemBuilder: (context, index) {
@@ -71,6 +82,8 @@ class ListJourney extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         // TODO: Implement journey selection
+                        AppLogger().info(
+                            'Journey selected: ${journey.startLocation} to ${journey.endLocation}');
                       },
                       child: const Text('Choisir'),
                     ),

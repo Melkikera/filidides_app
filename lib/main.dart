@@ -23,10 +23,8 @@ import 'dart:math';
 import 'src/components/app_logger.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/screens/onboarding_screen.dart';
-import 'domain/repositories/auth_repository.dart';
-import 'data/datasources/google_auth_datasource.dart';
-import 'data/repositories/auth_repository_impl.dart';
-import 'domain/entities/user.dart' hide User;
+// auth repository imports removed (not used in this file)
+// removed unused domain User import
 import 'firebase_options.dart';
 
 void main() async {
@@ -44,14 +42,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.light;
-  bool _isLoading = true;
   User? _currentUser;
-  late final AuthRepository _authRepository;
+  // Auth repository removed (not used in this file)
 
   @override
   void initState() {
     super.initState();
-    _authRepository = AuthRepositoryImpl(GoogleAuthDataSource());
+    // initialization moved/removed — keep init simple
   }
 
   void _handleThemeChange(ThemeMode mode) {
@@ -126,7 +123,6 @@ class _MapScreenState extends State<MapScreen> {
   Set<Polyline> _polylines = {};
   List<LatLng> _routePoints = [];
   late PolylinePoints polylinePoints;
-  bool _mapInitialized = false;
   String _travelTime = "Calcul en cours...";
   TravelMode _selectedMode = TravelMode.driving;
   final TextEditingController _searchController = TextEditingController();
@@ -149,7 +145,8 @@ class _MapScreenState extends State<MapScreen> {
     await checkAndRequestPermission();
     _locationService = GoogleLocationService(Constants.googleMapsApiKey);
     _placesService = GooglePlacesService(Constants.googleMapsApiKey);
-    setState(() => _mapInitialized = true);
+    // trigger a rebuild after services are ready
+    setState(() {});
   }
 
   Future<void> checkAndRequestPermission() async {
@@ -333,16 +330,18 @@ class _MapScreenState extends State<MapScreen> {
       'timestamp': DateTime.now().toIso8601String(),
     };
 
-    // Save to file (local storage)
+    // Save to file (local storage) in application documents under src/data
     try {
-      final directory = await getDownloadsDirectory();
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final customDir = Directory('${appDocDir.path}/src/data');
+      if (!await customDir.exists()) {
+        await customDir.create(recursive: true);
+      }
       final file = File(
-        '${directory?.path}/journey_${DateTime.now().millisecondsSinceEpoch}.json',
-      );
+          '${customDir.path}/journey_${DateTime.now().millisecondsSinceEpoch}.json');
       await file.writeAsString(jsonEncode(journeyData));
       AppLogger().info(
-        'Journey saved: distance=$_journeyDistance, time=$_travelTime',
-      );
+          'Journey saved to ${file.path}: distance=$_journeyDistance, time=$_travelTime');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Journey saved successfully!')),
@@ -351,9 +350,8 @@ class _MapScreenState extends State<MapScreen> {
     } catch (e) {
       AppLogger().error('Error saving journey: $e');
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error saving journey: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error saving journey: $e')));
       }
     }
   }
@@ -582,29 +580,41 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
     } else if (_selectedIndex == 1) {
-      // Load saved journeys from files
-      final directory = await getDownloadsDirectory();
-      final files = directory?.listSync().where(
-            (file) => file.path.endsWith('.json'),
-          );
-
+      // Load saved journeys from application documents src/data
       List<Journey> journeys = [];
-
-      if (files != null) {
-        for (final file in files) {
-          final content = await File(file.path).readAsString();
-          final data = jsonDecode(content);
-          journeys.add(Journey(
-            points: (data['routePoints'] as List)
-                .map((p) => LatLng(p['lat'], p['lng']))
-                .toList(),
-            startLocation: data['startLocation'],
-            endLocation: data['endLocation'],
-            distance: data['distance'],
-            duration: data['travelTime'],
-            price: data['price'],
-          ));
+      try {
+        final appDocDir = await getApplicationDocumentsDirectory();
+        final customDir = Directory('${appDocDir.path}/src/data');
+        if (await customDir.exists()) {
+          final filesList = customDir
+              .listSync()
+              .where((f) => f.path.endsWith('.json'))
+              .toList(growable: false);
+          // sort by last modified, newest first
+          filesList.sort((a, b) {
+            try {
+              final aTime =
+                  File(a.path).lastModifiedSync().millisecondsSinceEpoch;
+              final bTime =
+                  File(b.path).lastModifiedSync().millisecondsSinceEpoch;
+              return bTime.compareTo(aTime);
+            } catch (e) {
+              return 0;
+            }
+          });
+          for (final fileEntity in filesList) {
+            try {
+              final content = await File(fileEntity.path).readAsString();
+              final data = jsonDecode(content) as Map<String, dynamic>;
+              journeys.add(Journey.fromJson(data));
+            } catch (e) {
+              AppLogger()
+                  .error('Error parsing journey file ${fileEntity.path}: $e');
+            }
+          }
         }
+      } catch (e) {
+        AppLogger().error('Error loading journeys: $e');
       }
 
       return ListJourney(journeys: journeys);

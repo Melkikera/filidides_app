@@ -28,13 +28,14 @@ class Journey {
   factory Journey.fromJson(Map<String, dynamic> json) {
     return Journey(
       points: (json['routePoints'] as List)
-          .map((p) => LatLng(p['lat'] as double, p['lng'] as double))
+          .map((p) => LatLng(
+              (p['lat'] as num).toDouble(), (p['lng'] as num).toDouble()))
           .toList(),
       startLocation: json['startLocation'] as String,
       endLocation: json['endLocation'] as String,
-      distance: json['distance'] as double,
+      distance: (json['distance'] as num).toDouble(),
       duration: json['travelTime'] as String,
-      price: json['price'] as double,
+      price: (json['price'] as num).toDouble(),
     );
   }
 
