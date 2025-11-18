@@ -116,11 +116,13 @@ class _MapScreenState extends State<MapScreen> {
   final TextEditingController _chatInputController = TextEditingController();
   late GoogleLocationService _locationService;
   late GooglePlacesService _placesService;
-  List<String> _autocompleteSuggestions = [];
+  List<Map<String, String>> _autocompleteSuggestions = [];
   bool _showSuggestions = false;
   late GoogleMapController mapController;
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
+  final Map<String, Map<String, String>> _markerPlaceInfo = {};
+  int _searchMarkerCounter = 0;
   List<LatLng> _routePoints = [];
   late PolylinePoints polylinePoints;
   String _travelTime = "Calcul en cours...";
@@ -315,14 +317,27 @@ class _MapScreenState extends State<MapScreen> {
           .map((m) => {
                 'lat': m.position.latitude,
                 'lng': m.position.longitude,
-                'title': m.infoWindow.title,
+                'title': _markerPlaceInfo[m.markerId.value]?['title'] ??
+                    m.infoWindow.title ??
+                    '',
+                'place_id':
+                    _markerPlaceInfo[m.markerId.value]?['place_id'] ?? ''
               })
           .toList(),
       'routePoints': _routePoints
           .map((p) => {'lat': p.latitude, 'lng': p.longitude})
           .toList(),
-      'startLocation': _markers.first.infoWindow.title,
-      'endLocation': _markers.last.infoWindow.title,
+      'startLocation': _markerPlaceInfo[_markers.first.markerId.value]
+              ?['title'] ??
+          _markers.first.infoWindow.title ??
+          '',
+      'start_place_id':
+          _markerPlaceInfo[_markers.first.markerId.value]?['place_id'] ?? '',
+      'endLocation': _markerPlaceInfo[_markers.last.markerId.value]?['title'] ??
+          _markers.last.infoWindow.title ??
+          '',
+      'end_place_id':
+          _markerPlaceInfo[_markers.last.markerId.value]?['place_id'] ?? '',
       'travelTime': _travelTime,
       'mode': _selectedMode.toString(),
       'distance': _journeyDistance,
@@ -522,17 +537,28 @@ class _MapScreenState extends State<MapScreen> {
             );
             if (location != null) {
               setState(() {
-                String markerId = "search_location";
+                final markerId = "search_location_${_searchMarkerCounter++}";
                 _markers.add(
                   Marker(
                     markerId: MarkerId(markerId),
                     position: location,
                     infoWindow: InfoWindow(title: value),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueAzure),
+                    onTap: () {
+                      setState(() {
+                        _markers
+                            .removeWhere((m) => m.markerId.value == markerId);
+                        _markerPlaceInfo.remove(markerId);
+                        _updateRoute();
+                      });
+                    },
                   ),
                 );
                 mapController.animateCamera(
                   CameraUpdate.newLatLngZoom(location, 15),
                 );
+                _markerPlaceInfo[markerId] = {'title': value, 'place_id': ''};
                 _showSuggestions = false;
               });
             } else {
@@ -546,30 +572,49 @@ class _MapScreenState extends State<MapScreen> {
           showSuggestions: _showSuggestions,
           suggestions: _autocompleteSuggestions,
           onSuggestionTap: (suggestion) async {
-            _searchController.text = suggestion;
+            final description = suggestion['description'] ?? '';
+            final placeId = suggestion['place_id'];
+            _searchController.text = description;
             setState(() {
               _showSuggestions = false;
             });
-            final LatLng? location = await _locationService.searchLocation(
-              suggestion,
-            );
+            LatLng? location;
+            if (placeId != null && placeId.isNotEmpty) {
+              location = await _locationService.getLocationFromPlaceId(placeId);
+            }
+            location ??= await _locationService.searchLocation(description);
             if (location != null) {
+              final LatLng loc = location;
               setState(() {
-                String markerId = "search_location";
+                final markerId = 'search_location_${_searchMarkerCounter++}';
                 _markers.add(
                   Marker(
                     markerId: MarkerId(markerId),
-                    position: location,
-                    infoWindow: InfoWindow(title: suggestion),
+                    position: loc,
+                    infoWindow: InfoWindow(title: description),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueAzure),
+                    onTap: () {
+                      setState(() {
+                        _markers
+                            .removeWhere((m) => m.markerId.value == markerId);
+                        _markerPlaceInfo.remove(markerId);
+                        _updateRoute();
+                      });
+                    },
                   ),
                 );
                 mapController.animateCamera(
-                  CameraUpdate.newLatLngZoom(location, 15),
+                  CameraUpdate.newLatLngZoom(loc, 15),
                 );
+                _markerPlaceInfo[markerId] = {
+                  'title': description,
+                  'place_id': placeId ?? ''
+                };
               });
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Lieu non trouvé: $suggestion')),
+                SnackBar(content: Text('Lieu non trouvé: $description')),
               );
             }
           },
