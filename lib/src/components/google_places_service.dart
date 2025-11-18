@@ -6,7 +6,9 @@ class GooglePlacesService {
   final String apiKey;
   GooglePlacesService(this.apiKey);
 
-  Future<List<String>> getAutocompleteSuggestions(String input) async {
+  /// Returns a list of maps with keys: 'description' and 'place_id'
+  Future<List<Map<String, String>>> getAutocompleteSuggestions(
+      String input) async {
     final url = Uri.parse(
       'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Uri.encodeComponent(input)}&key=$apiKey',
     );
@@ -17,8 +19,11 @@ class GooglePlacesService {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['status'] == 'OK') {
-        return List<String>.from(
-          data['predictions'].map((p) => p['description']),
+        return List<Map<String, String>>.from(
+          data['predictions'].map((p) => {
+                'description': p['description'] as String,
+                'place_id': p['place_id'] as String,
+              }),
         );
       }
     }

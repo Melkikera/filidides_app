@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class SearchSuggestions extends StatelessWidget {
   final bool showSuggestions;
-  final List<String> suggestions;
-  final void Function(String) onSuggestionTap;
+  final List<Map<String, String>> suggestions;
+  final void Function(Map<String, String>) onSuggestionTap;
 
   const SearchSuggestions({
     Key? key,
@@ -28,7 +28,7 @@ class SearchSuggestions extends StatelessWidget {
         itemBuilder: (context, index) {
           final suggestion = suggestions[index];
           return ListTile(
-            title: Text(suggestion),
+            title: Text(suggestion['description'] ?? ''),
             onTap: () => onSuggestionTap(suggestion),
           );
         },

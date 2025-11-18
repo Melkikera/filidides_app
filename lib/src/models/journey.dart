@@ -3,7 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class Journey {
   final List<LatLng> points;
   final String startLocation;
+  final String? startPlaceId;
   final String endLocation;
+  final String? endPlaceId;
   final double distance;
   final String duration;
   final double price;
@@ -11,7 +13,9 @@ class Journey {
   Journey({
     required this.points,
     required this.startLocation,
+    this.startPlaceId,
     required this.endLocation,
+    this.endPlaceId,
     required this.distance,
     required this.duration,
     required this.price,
@@ -32,7 +36,14 @@ class Journey {
               (p['lat'] as num).toDouble(), (p['lng'] as num).toDouble()))
           .toList(),
       startLocation: json['startLocation'] as String,
+      startPlaceId:
+          json['start_place_id'] != null && json['start_place_id'] != ''
+              ? json['start_place_id'] as String
+              : null,
       endLocation: json['endLocation'] as String,
+      endPlaceId: json['end_place_id'] != null && json['end_place_id'] != ''
+          ? json['end_place_id'] as String
+          : null,
       distance: (json['distance'] as num).toDouble(),
       duration: json['travelTime'] as String,
       price: (json['price'] as num).toDouble(),
@@ -45,7 +56,9 @@ class Journey {
       'routePoints':
           points.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList(),
       'startLocation': startLocation,
+      'start_place_id': startPlaceId ?? '',
       'endLocation': endLocation,
+      'end_place_id': endPlaceId ?? '',
       'distance': distance,
       'travelTime': duration,
       'price': price,

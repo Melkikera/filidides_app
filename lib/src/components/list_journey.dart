@@ -44,6 +44,15 @@ class ListJourney extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
+                    if (journey.startPlaceId != null &&
+                        journey.startPlaceId!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          '(${journey.startPlaceId})',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -57,6 +66,15 @@ class ListJourney extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
+                    if (journey.endPlaceId != null &&
+                        journey.endPlaceId!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          '(${journey.endPlaceId})',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
                   ],
                 ),
                 const Divider(),
