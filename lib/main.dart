@@ -26,6 +26,7 @@ import 'presentation/screens/onboarding_screen.dart';
 // auth repository imports removed (not used in this file)
 // removed unused domain User import
 import 'firebase_options.dart';
+import 'package:dio/dio.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,6 +65,21 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: _themeMode,
+      routes: {
+        '/map': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>?;
+          return MapScreen(
+            onThemeChanged: _handleThemeChange,
+            themeMode: _themeMode,
+            user: _currentUser,
+            initialStartDescription: args?['startDescription'] as String?,
+            initialStartPlaceId: args?['startPlaceId'] as String?,
+            initialEndDescription: args?['endDescription'] as String?,
+            initialEndPlaceId: args?['endPlaceId'] as String?,
+          );
+        }
+      },
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -95,13 +111,21 @@ class _MyAppState extends State<MyApp> {
 class MapScreen extends StatefulWidget {
   final ValueChanged<ThemeMode> onThemeChanged;
   final ThemeMode themeMode;
-  final User? user; // Add this
+  final User? user;
+  final String? initialStartDescription;
+  final String? initialStartPlaceId;
+  final String? initialEndDescription;
+  final String? initialEndPlaceId;
 
   const MapScreen({
     Key? key,
     required this.onThemeChanged,
     required this.themeMode,
-    this.user, // Add this
+    this.user,
+    this.initialStartDescription,
+    this.initialStartPlaceId,
+    this.initialEndDescription,
+    this.initialEndPlaceId,
   }) : super(key: key);
 
   @override
@@ -149,6 +173,77 @@ class _MapScreenState extends State<MapScreen> {
     _placesService = GooglePlacesService(Constants.googleMapsApiKey);
     // trigger a rebuild after services are ready
     setState(() {});
+    // If onboarding provided initial start/end, resolve them to markers
+    await _applyInitialOnboardingMarkers();
+  }
+
+  Future<void> _applyInitialOnboardingMarkers() async {
+    // resolve start
+    if (widget.initialStartPlaceId != null ||
+        widget.initialStartDescription != null) {
+      LatLng? startLoc;
+      if (widget.initialStartPlaceId != null &&
+          widget.initialStartPlaceId!.isNotEmpty) {
+        startLoc = await _locationService
+            .getLocationFromPlaceId(widget.initialStartPlaceId!);
+      }
+      startLoc ??= widget.initialStartDescription != null
+          ? await _locationService
+              .searchLocation(widget.initialStartDescription!)
+          : null;
+      if (startLoc != null) {
+        final markerId = 'onb_start';
+        _markers.add(
+          Marker(
+            markerId: MarkerId(markerId),
+            position: startLoc,
+            infoWindow:
+                InfoWindow(title: widget.initialStartDescription ?? 'Start'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueAzure),
+          ),
+        );
+        _markerPlaceInfo[markerId] = {
+          'title': widget.initialStartDescription ?? '',
+          'place_id': widget.initialStartPlaceId ?? ''
+        };
+      }
+    }
+
+    if (widget.initialEndPlaceId != null ||
+        widget.initialEndDescription != null) {
+      LatLng? endLoc;
+      if (widget.initialEndPlaceId != null &&
+          widget.initialEndPlaceId!.isNotEmpty) {
+        endLoc = await _locationService
+            .getLocationFromPlaceId(widget.initialEndPlaceId!);
+      }
+      endLoc ??= widget.initialEndDescription != null
+          ? await _locationService.searchLocation(widget.initialEndDescription!)
+          : null;
+      if (endLoc != null) {
+        final markerId = 'onb_end';
+        _markers.add(
+          Marker(
+            markerId: MarkerId(markerId),
+            position: endLoc,
+            infoWindow:
+                InfoWindow(title: widget.initialEndDescription ?? 'End'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueAzure),
+          ),
+        );
+        _markerPlaceInfo[markerId] = {
+          'title': widget.initialEndDescription ?? '',
+          'place_id': widget.initialEndPlaceId ?? ''
+        };
+      }
+    }
+
+    // If both markers exist, update route
+    if (_markers.length >= 2) {
+      _updateRoute();
+    }
   }
 
   Future<void> checkAndRequestPermission() async {
@@ -178,6 +273,21 @@ class _MapScreenState extends State<MapScreen> {
       );
       _updateRoute();
     });
+  }
+
+  Future<String?> getPlaceId(double lat, double lng, String apiKey) async {
+    final dio = Dio();
+    final url =
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$apiKey';
+
+    final response = await dio.get(url);
+    if (response.statusCode == 200) {
+      final results = response.data['results'];
+      if (results != null && results.length > 0) {
+        return results[0]['place_id'];
+      }
+    }
+    return null;
   }
 
   // Calculate total distance in kilometers
@@ -329,12 +439,12 @@ class _MapScreenState extends State<MapScreen> {
           .toList(),
       'startLocation': _markerPlaceInfo[_markers.first.markerId.value]
               ?['title'] ??
-          _markers.first.infoWindow.title ??
+          _markerPlaceInfo[_markers.first.markerId.value]?['place_name'] ??
           '',
       'start_place_id':
           _markerPlaceInfo[_markers.first.markerId.value]?['place_id'] ?? '',
       'endLocation': _markerPlaceInfo[_markers.last.markerId.value]?['title'] ??
-          _markers.last.infoWindow.title ??
+          _markerPlaceInfo[_markers.last.markerId.value]?['place_name'] ??
           '',
       'end_place_id':
           _markerPlaceInfo[_markers.last.markerId.value]?['place_id'] ?? '',
