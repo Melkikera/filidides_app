@@ -1,5 +1,5 @@
 // TODO Implement this library.
-library logger_service;
+library;
 
 import 'package:logger/logger.dart';
 

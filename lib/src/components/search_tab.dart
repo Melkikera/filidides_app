@@ -8,12 +8,12 @@ class SearchTab extends StatelessWidget {
   final Widget travelInfo;
 
   const SearchTab({
-    Key? key,
+    super.key,
     required this.googleMap,
     required this.searchBar,
     required this.suggestions,
     required this.travelInfo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

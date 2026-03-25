@@ -35,7 +35,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -118,7 +118,7 @@ class MapScreen extends StatefulWidget {
   final String? initialEndPlaceId;
 
   const MapScreen({
-    Key? key,
+    super.key,
     required this.onThemeChanged,
     required this.themeMode,
     this.user,
@@ -126,7 +126,7 @@ class MapScreen extends StatefulWidget {
     this.initialStartPlaceId,
     this.initialEndDescription,
     this.initialEndPlaceId,
-  }) : super(key: key);
+  });
 
   @override
   _MapScreenState createState() => _MapScreenState();
@@ -143,17 +143,17 @@ class _MapScreenState extends State<MapScreen> {
   List<Map<String, String>> _autocompleteSuggestions = [];
   bool _showSuggestions = false;
   late GoogleMapController mapController;
-  Set<Marker> _markers = {};
-  Set<Polyline> _polylines = {};
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
   final Map<String, Map<String, String>> _markerPlaceInfo = {};
   int _searchMarkerCounter = 0;
-  List<LatLng> _routePoints = [];
+  final List<LatLng> _routePoints = [];
   late PolylinePoints polylinePoints;
   String _travelTime = "Calcul en cours...";
   TravelMode _selectedMode = TravelMode.driving;
   final TextEditingController _searchController = TextEditingController();
   int _selectedIndex = 0;
-  List<String> _chatMessages = [
+  final List<String> _chatMessages = [
     'Bienvenue dans le chat!',
     'Message reçu via SignalR (simulé)',
     'Autre message...',
@@ -553,15 +553,15 @@ class _MapScreenState extends State<MapScreen> {
                         _travelTime = "Calcul en cours...";
                       });
                     },
-                    child: const Icon(Icons.delete),
                     tooltip: 'Clear',
+                    child: const Icon(Icons.delete),
                   ),
                   const SizedBox(height: 12),
                   FloatingActionButton(
                     heroTag: 'save',
                     onPressed: _saveJourney,
-                    child: const Icon(Icons.save),
                     tooltip: 'Save journey',
+                    child: const Icon(Icons.save),
                   ),
                 ],
               ),

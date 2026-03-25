@@ -5,10 +5,10 @@ class TravelInfo extends StatelessWidget {
   final double journeyDistance;
 
   const TravelInfo({
-    Key? key,
+    super.key,
     required this.travelTime,
     required this.journeyDistance,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

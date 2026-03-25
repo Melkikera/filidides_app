@@ -15,7 +15,7 @@ class SettingsComponent extends StatefulWidget {
   final ValueChanged<ThemeMode> onThemeChanged;
   final ValueChanged<Map<String, String>> onProfileUpdated;
   const SettingsComponent({
-    Key? key,
+    super.key,
     required this.firstName,
     required this.lastName,
     required this.email,
@@ -23,7 +23,7 @@ class SettingsComponent extends StatefulWidget {
     required this.themeMode,
     required this.onThemeChanged,
     required this.onProfileUpdated,
-  }) : super(key: key);
+  });
 
   @override
   State<SettingsComponent> createState() => _SettingsComponentState();

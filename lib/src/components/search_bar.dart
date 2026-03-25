@@ -6,11 +6,11 @@ class SearchBar extends StatelessWidget {
   final void Function(String) onSubmitted;
 
   const SearchBar({
-    Key? key,
+    super.key,
     required this.controller,
     required this.onChanged,
     required this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

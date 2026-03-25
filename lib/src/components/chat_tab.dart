@@ -7,11 +7,11 @@ class ChatTab extends StatelessWidget {
   final void Function(String) onSend;
 
   const ChatTab({
-    Key? key,
+    super.key,
     required this.messages,
     required this.inputController,
     required this.onSend,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

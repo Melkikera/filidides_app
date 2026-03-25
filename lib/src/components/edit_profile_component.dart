@@ -9,13 +9,13 @@ class EditProfileComponent extends StatefulWidget {
   final String avatarUrl;
   final ValueChanged<Map<String, String>> onProfileUpdated;
   const EditProfileComponent({
-    Key? key,
+    super.key,
     required this.firstName,
     required this.lastName,
     required this.email,
     required this.avatarUrl,
     required this.onProfileUpdated,
-  }) : super(key: key);
+  });
 
   @override
   State<EditProfileComponent> createState() => _EditProfileComponentState();
@@ -70,11 +70,9 @@ class _EditProfileComponentState extends State<EditProfileComponent> {
               backgroundImage: _avatarFile != null
                   ? FileImage(_avatarFile!)
                   : (_avatarUrl != null && _avatarUrl!.isNotEmpty
-                            ? NetworkImage(_avatarUrl!)
-                            : null)
-                        as ImageProvider?,
-              child:
-                  (_avatarFile == null &&
+                      ? NetworkImage(_avatarUrl!)
+                      : null) as ImageProvider?,
+              child: (_avatarFile == null &&
                       (_avatarUrl == null || _avatarUrl!.isEmpty))
                   ? const Icon(Icons.person, size: 40)
                   : null,

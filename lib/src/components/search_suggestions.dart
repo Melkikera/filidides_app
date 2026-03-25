@@ -6,11 +6,11 @@ class SearchSuggestions extends StatelessWidget {
   final void Function(Map<String, String>) onSuggestionTap;
 
   const SearchSuggestions({
-    Key? key,
+    super.key,
     required this.showSuggestions,
     required this.suggestions,
     required this.onSuggestionTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

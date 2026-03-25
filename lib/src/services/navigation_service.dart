@@ -1,5 +1,5 @@
 // TODO Implement this library.
-library navigation_service;
+library;
 
 import 'package:flutter/material.dart';
 

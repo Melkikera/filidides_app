@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MessageReceiver extends StatefulWidget {
   final List<String> messages;
-  const MessageReceiver({Key? key, required this.messages}) : super(key: key);
+  const MessageReceiver({super.key, required this.messages});
 
   @override
   State<MessageReceiver> createState() => _MessageReceiverState();
