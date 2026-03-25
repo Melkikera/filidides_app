@@ -1,16 +1,108 @@
 # filidides_app
 
-A new Flutter project.
+Flutter application for the Filidides project.
 
-## Getting Started
+## App Description
 
-This project is a starting point for a Flutter application.
+Filidides is a route planning and journey tracking app built with Flutter.
+It helps users search places, plan trips on Google Maps, draw routes with
+travel-time estimates, and manage journey sessions. The app includes Firebase
+authentication, onboarding flow, and profile/settings support for a complete
+mobile-first navigation experience.
 
-A few resources to get you started if this is your first Flutter project:
+## Quick Launch Commands
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Run these from the project root.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 1) Verify toolchain
+
+```bash
+flutter --version
+flutter doctor -v
+```
+
+### 2) Install dependencies
+
+```bash
+flutter pub get
+```
+
+### 3) List available devices
+
+```bash
+flutter devices
+```
+
+### 4) Launch app (recommended debug run)
+
+```bash
+flutter run
+```
+
+## Platform-Specific Launch
+
+### Android (emulator or USB device)
+
+```bash
+flutter run -d android
+```
+
+### iOS (macOS + Xcode only)
+
+```bash
+flutter run -d ios
+```
+
+### Web (Chrome)
+
+```bash
+flutter run -d chrome
+```
+
+### Windows desktop
+
+```bash
+flutter run -d windows
+```
+
+### Linux desktop
+
+```bash
+flutter run -d linux
+```
+
+### macOS desktop
+
+```bash
+flutter run -d macos
+```
+
+## Useful Development Commands
+
+```bash
+# Clean and rebuild dependencies
+flutter clean
+flutter pub get
+
+# Run static analysis
+flutter analyze
+
+# Run tests
+flutter test
+```
+
+## Build Commands (release)
+
+```bash
+# Android APK
+flutter build apk --release
+
+# Android App Bundle
+flutter build appbundle --release
+
+# Web build
+flutter build web --release
+
+# Windows release build
+flutter build windows --release
+```
