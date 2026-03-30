@@ -66,6 +66,12 @@ class _MyAppState extends State<MyApp> {
       darkTheme: ThemeData.dark(),
       themeMode: _themeMode,
       routes: {
+        '/onboarding': (context) => OnboardingScreen(
+              onSignIn: (firebaseUser) {
+                AppLogger().info(
+                    'User signed in from onboarding route: ${firebaseUser.displayName}');
+              },
+            ),
         '/map': (context) {
           final args = ModalRoute.of(context)!.settings.arguments
               as Map<String, dynamic>?;
@@ -251,6 +257,10 @@ class _MapScreenState extends State<MapScreen> {
     if (!status.isGranted) {
       await Permission.location.request();
     }
+  }
+
+  void _startNewJourney() {
+    Navigator.of(context).pushReplacementNamed('/onboarding');
   }
 
   void _onMapTap(LatLng position) {
@@ -555,6 +565,13 @@ class _MapScreenState extends State<MapScreen> {
                     },
                     tooltip: 'Clear',
                     child: const Icon(Icons.delete),
+                  ),
+                  const SizedBox(height: 12),
+                  FloatingActionButton(
+                    heroTag: 'new-journey',
+                    onPressed: _startNewJourney,
+                    tooltip: 'New journey',
+                    child: const Icon(Icons.restart_alt),
                   ),
                   const SizedBox(height: 12),
                   FloatingActionButton(

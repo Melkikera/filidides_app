@@ -42,15 +42,23 @@ class ListJourney extends StatelessWidget {
                       child: Text(
                         journey.startLocation,
                         style: const TextStyle(fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (journey.startPlaceId != null &&
                         journey.startPlaceId!.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          '(${journey.startPlaceId})',
-                          style: Theme.of(context).textTheme.bodySmall,
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            '(${journey.startPlaceId})',
+                            style: Theme.of(context).textTheme.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                       ),
                   ],
@@ -64,39 +72,65 @@ class ListJourney extends StatelessWidget {
                       child: Text(
                         journey.endLocation,
                         style: const TextStyle(fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (journey.endPlaceId != null &&
                         journey.endPlaceId!.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          '(${journey.endPlaceId})',
-                          style: Theme.of(context).textTheme.bodySmall,
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            '(${journey.endPlaceId})',
+                            style: Theme.of(context).textTheme.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                       ),
                   ],
                 ),
                 const Divider(),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Distance: ${journey.distance.toStringAsFixed(1)} km'),
-                    Text('Durée: ${journey.duration}'),
+                    Expanded(
+                      child: Text(
+                        'Distance: ${journey.distance.toStringAsFixed(1)} km',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Durée: ${journey.duration}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      'Prix: ${journey.price.toStringAsFixed(2)} \$',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                    Expanded(
+                      child: Text(
+                        'Prix: ${journey.price.toStringAsFixed(2)} \$',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 12),
                     ElevatedButton(
                       onPressed: () {
                         // TODO: Implement journey selection
